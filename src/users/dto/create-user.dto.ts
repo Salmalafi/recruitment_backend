@@ -1,5 +1,18 @@
-/* eslint-disable prettier/prettier */
+// create-user.dto.ts
+
+import { Role } from "src/auth/role.enum";
+
+
 export class CreateUserDto {
-    firstName: string;
-    lastName: string;
-  }
+  readonly email: string;
+  readonly password: string;
+  readonly roles: Role[];
+}
+
+
+
+export class UpdateUserDto {
+  readonly email?: string;
+  readonly password?: string;
+  readonly roles?: Role[];
+}

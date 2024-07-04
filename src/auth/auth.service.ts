@@ -11,19 +11,17 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signIn(
-    email: string, // Change 'username' to 'email'
-    password: string, // No change needed here
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findByEmail(email); // Assuming this method is implemented in UsersService
+  async signIn(email: string, password: string): Promise<{ access_token: string }> {
+    const user = await this.usersService.findByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials'); // Adjust error message as needed
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { sub: user._id, email: user.email }; // Change 'username' to 'email'
+    const payload = { sub: user._id, email: user.email, roles: user.role };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
+  
 
   async validateOAuthLogin(profile: any, provider: string): Promise<any> {
     let user = await this.usersService.findOneByOAuthId(profile.id, provider);

@@ -4,28 +4,25 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { SetMetadata } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { usersProviders } from '../users/users.providers';
 import { databaseProviders } from 'src/database/database.providers';
 import { DatabaseModule } from 'src/database/database.module';
-import { LinkedInStrategy } from './linkedin.strategy'; // Add this line
-
+import { LinkedInStrategy } from './linkedin.strategy';
 import * as dotenv from 'dotenv';
 import * as dotenvExpand from 'dotenv-expand';
-import { LinkedInController } from '../linkedin/linkedin.controller';
-
-
+import { RolesGuard } from './roles.guard';
 
 dotenvExpand.expand(dotenv.config());
+
 @Module({
   imports: [
     DatabaseModule,
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: "salmaaaaaaaa45789621",
+      secret: process.env.SECRET_KEY, // Ensure this matches with your .env configuration
       signOptions: { expiresIn: '3600s' },
     }),
   ],
@@ -37,11 +34,16 @@ dotenvExpand.expand(dotenv.config());
     ...usersProviders,
     ...databaseProviders,
     AuthService,
-    LinkedInStrategy, // Add this line
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    LinkedInStrategy,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, LinkedInStrategy],
 })
 export class AuthModule {}
+
 
 

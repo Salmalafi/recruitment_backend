@@ -9,14 +9,18 @@ import {
   Post,
   ParseIntPipe,
   SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
-import { Public } from 'src/auth/auth.controller';
+import { Public, Roles } from 'src/auth/auth.controller';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.enum';
 
 
 
-
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -26,18 +30,16 @@ export class UsersController {
   create(@Body() newUser: User): Promise<User> {
     return this.usersService.create(newUser);
   }
-
+  @Roles(Role.Admin)
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
-
-
   @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
-  @Public()
+  @Roles(Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.usersService.remove(id);

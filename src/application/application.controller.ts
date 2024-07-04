@@ -1,16 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, Bind } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, Bind, UseGuards } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { Public } from 'src/auth/auth.controller';
+import { Public, Roles } from 'src/auth/auth.controller';
 import { CreateApplicationDto } from './DTO/CreateApplicationDto';
 import { ApplicationsService } from './application.service';
 import { UpdateApplicationDto } from './DTO/UpdateApplicationDto';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Role } from 'src/auth/role.enum';
 
+import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
+
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
-
-  @Public()
+ @Roles(Role.User)
   @Post()
   @Bind(UploadedFiles())
   @UseInterceptors(FileFieldsInterceptor([
@@ -35,24 +39,23 @@ export class ApplicationsController {
 
     return this.applicationsService.create(createApplicationDto);
   }
-
-  @Public()
+  @Roles(Role.Admin, Role.HrAgent)
   @Get()
   findAll() {
     return this.applicationsService.findAll();
   }
-  @Public()
+  @Roles(Role.User, Role.HrAgent)
   @Get('user/:userId')
   findByUserId(@Param('userId') userId: string) {
     const objectId = new ObjectId(userId); 
     return this.applicationsService.findByUserId(objectId);
   }
-  @Public()
+  @Roles(Role.HrAgent)
   @Get('offer/:offerId')
   findByOfferId(@Param('offerId') offerId: ObjectId) {
     return this.applicationsService.findByOfferId(offerId);
   }
-  @Public()
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     const objectId = new ObjectId(id);

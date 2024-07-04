@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./auth/custom.d.ts"],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,

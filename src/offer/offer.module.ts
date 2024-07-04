@@ -7,6 +7,9 @@ import { Application } from '../application/application.entity'; // Corrected im
 import { Offer } from './offer.entity'; // Assuming Offer entity is defined in offer.entity.ts
 import { databaseProviders } from 'src/database/database.providers';
 import { DatabaseModule } from 'src/database/database.module';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 
 @Module({
@@ -23,7 +26,13 @@ import { DatabaseModule } from 'src/database/database.module';
       }),
     DatabaseModule
   ],
-  providers: [OffersService],
+  providers: [OffersService,   {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },{
+    provide: APP_GUARD,
+    useClass: AuthGuard,
+  }],
   controllers: [OffersController],
 })
 export class OffersModule {}

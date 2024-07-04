@@ -12,8 +12,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { Role } from './role.enum';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -25,7 +28,6 @@ export class AuthController {
     return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
-@Public()
 @UseGuards(AuthGuard('linkedin'))
 @Get('linkedin')
   async linkedinAuth(@Req() req) {
