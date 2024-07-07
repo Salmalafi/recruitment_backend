@@ -13,6 +13,9 @@ import { LinkedInStrategy } from './linkedin.strategy';
 import * as dotenv from 'dotenv';
 import * as dotenvExpand from 'dotenv-expand';
 import { RolesGuard } from './roles.guard';
+import { PasswordResetService } from './password-reset.service';
+import { MailerService } from './nodemailer.service';
+import { PasswordResetController } from './PasswordReset.controller';
 
 dotenvExpand.expand(dotenv.config());
 
@@ -22,8 +25,8 @@ dotenvExpand.expand(dotenv.config());
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: process.env.SECRET_KEY, // Ensure this matches with your .env configuration
-      signOptions: { expiresIn: '3600s' },
+      secret: process.env.SECRET_KEY, 
+      signOptions: { expiresIn: '36000s' },
     }),
   ],
   providers: [
@@ -39,8 +42,9 @@ dotenvExpand.expand(dotenv.config());
       useClass: RolesGuard,
     },
     LinkedInStrategy,
+    PasswordResetService, MailerService
   ],
-  controllers: [AuthController],
+  controllers: [AuthController,PasswordResetController],
   exports: [AuthService, LinkedInStrategy],
 })
 export class AuthModule {}

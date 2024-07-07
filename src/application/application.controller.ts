@@ -14,7 +14,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
- @Roles(Role.User)
+ @Roles(Role.Candidate)
   @Post()
   @Bind(UploadedFiles())
   @UseInterceptors(FileFieldsInterceptor([

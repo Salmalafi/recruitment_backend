@@ -59,7 +59,11 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   updatedAt: Date;
+  @Column({ default: null })
+  resetPasswordToken: string;
 
+  @Column({ default: null })
+  resetPasswordExpires: Date;
   @Column({ nullable: true })
   linkedinId: string;
   @OneToMany(() => Application, application => application.user)

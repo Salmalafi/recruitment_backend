@@ -5,7 +5,6 @@ import { UpdateOfferDto } from './DTO/UpdateOfferDto';
 import { Public, Roles } from 'src/auth/auth.controller';
 import { ObjectId } from 'mongodb';
 
-
 import { Role } from 'src/auth/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -15,7 +14,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('offers')
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
-  @Roles(Role.HrAgent)
+@Public()
+  //@Roles(Role.HrAgent)
   @Post()
   create(@Body() createOfferDto: CreateOfferDto) {
     return this.offersService.create(createOfferDto);

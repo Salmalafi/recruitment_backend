@@ -16,7 +16,7 @@ import { diskStorage } from 'multer';
 @Module({
   imports: [AuthModule, MulterModule.register({
     storage: diskStorage({
-      destination: './uploads', // Specify your upload directory
+      destination: './uploads', 
       filename: (req, file, cb) => {
         const filename = `${Date.now()}-${file.originalname}`;
         cb(null, filename);

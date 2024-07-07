@@ -39,6 +39,11 @@ export class UsersController {
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
+  @Public()
+  @Post('findByEmail')
+  async findByEmail(@Body('email') email: string): Promise<User> {
+    return this.usersService.findByEmail(email);
+  }
   @Roles(Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
