@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Application } from './application.entity';
 import { CreateApplicationDto } from './DTO/CreateApplicationDto';
-import { UpdateApplicationDto } from './DTO/UpdateApplicationDto';
+import { UpdateApplicationDto } from './DTO/CreateApplicationDto';
 import * as Grid from 'gridfs-stream';
 
 @Injectable()
@@ -15,9 +15,16 @@ export class ApplicationsService {
   ) {}
 
   async create(createApplicationDto: CreateApplicationDto): Promise<Application> {
-    const newApplication = this.applicationRepository.create({
-      ...createApplicationDto,
-    });
+    const { resume, date, userId, offerId, motivationLetter, status } = createApplicationDto;
+
+    const newApplication = new Application();
+    newApplication.resume = resume;
+    newApplication.date = date;
+    newApplication.userId = userId;
+    newApplication.offerId = offerId;
+    newApplication.motivationLetter = motivationLetter;
+    newApplication.status = status;
+
     return await this.applicationRepository.save(newApplication);
   }
   async findAll(): Promise<Application[]> {
@@ -25,7 +32,7 @@ export class ApplicationsService {
   }
 
   async findByUserId(userId: ObjectId): Promise<Application[]> {
-    return this.applicationRepository.find({ where: { userId: userId } });
+    return this.applicationRepository.find({ where: {userId: userId} });
   }
   async findByOfferId(offerId: ObjectId): Promise<Application[]> {
     return this.applicationRepository.find({

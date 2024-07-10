@@ -34,7 +34,7 @@ export class OffersController {
     return this.offersService.findOne(objectId);
   }
 
-  @Roles(Role.HrAgent)
+  @Public()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
     const objectId = new ObjectId(id);

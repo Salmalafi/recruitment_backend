@@ -1,21 +1,33 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { ObjectId } from 'mongodb';
+import { ApplicationStatus } from '../status.enum';
 
 export class CreateApplicationDto {
- 
-
-  @IsString()
-  @IsNotEmpty()
   resume: string;
-
-  @IsString()
-  @IsNotEmpty()
+  date: Date;
   userId: ObjectId;
-
-  @IsString()
-  @IsNotEmpty()
-  offerId:  ObjectId;
-
-  @IsString()
+  offerId: ObjectId;
   motivationLetter?: string;
+
+  status: ApplicationStatus = ApplicationStatus.PENDING;
+}
+
+export class UpdateApplicationDto {
+  @IsString()
+  @IsOptional()
+  resume?: string;
+
+  @IsOptional()
+  userId?: ObjectId;
+
+  @IsOptional()
+  offerId?: ObjectId;
+
+  @IsString()
+  @IsOptional()
+  motivationLetter?: string;
+
+  @IsEnum(ApplicationStatus)
+  @IsOptional()
+  status?: ApplicationStatus;
 }

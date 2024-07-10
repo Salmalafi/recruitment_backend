@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
-import { Entity, Column, ObjectIdColumn, ManyToOne, Unique } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, ManyToOne, Unique, CreateDateColumn } from 'typeorm';
 import { Offer } from 'src/offer/offer.entity';
 import { User } from 'src/users/users.entity';
+import { ApplicationStatus } from './status.enum';
 
 @Entity()
 @Unique(['userId', 'offerId'])
@@ -19,12 +20,16 @@ export class Application {
   user: User;
 
   @Column()
-  userId: ObjectId; 
+  userId: ObjectId;
+
   @Column({ nullable: true })
   motivationLetter?: string;
+
   @Column()
-  offerId: ObjectId; 
+  offerId: ObjectId;
+
+  @Column({ type: 'enum', enum: ApplicationStatus, default: ApplicationStatus.PENDING })
+  status: ApplicationStatus;
+  @CreateDateColumn()
+  date: Date;
 }
-
-
-

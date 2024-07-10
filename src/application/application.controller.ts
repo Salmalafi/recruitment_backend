@@ -1,14 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, Bind, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, Bind, UseGuards, Res } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { Public, Roles } from 'src/auth/auth.controller';
 import { CreateApplicationDto } from './DTO/CreateApplicationDto';
 import { ApplicationsService } from './application.service';
-import { UpdateApplicationDto } from './DTO/UpdateApplicationDto';
+import { UpdateApplicationDto } from './DTO/CreateApplicationDto';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Role } from 'src/auth/role.enum';
 
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
+import * as path from 'path';
+import { Response } from 'express';
+
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('applications')
@@ -44,18 +47,28 @@ export class ApplicationsController {
   findAll() {
     return this.applicationsService.findAll();
   }
-  @Roles(Role.User, Role.HrAgent)
+  @Roles(Role.Candidate, Role.HrAgent)
   @Get('user/:userId')
-  findByUserId(@Param('userId') userId: string) {
-    const objectId = new ObjectId(userId); 
-    return this.applicationsService.findByUserId(objectId);
+  async findByUserId(@Param('userId') userId: string) {
+    try {
+      const objectId = new ObjectId(userId); // Convert userId to ObjectId
+      return this.applicationsService.findByUserId(objectId);
+    } catch (error) {
+      console.error('Error converting userId to ObjectId:', error);
+      throw error; // Handle or rethrow the error as needed
+    }
+
   }
   @Roles(Role.HrAgent)
   @Get('offer/:offerId')
   findByOfferId(@Param('offerId') offerId: ObjectId) {
     return this.applicationsService.findByOfferId(offerId);
   }
-
+  @Get('resume/:filename')
+  getResume(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(__dirname, '..', '..', 'uploads', filename);
+    res.sendFile(filePath);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     const objectId = new ObjectId(id);

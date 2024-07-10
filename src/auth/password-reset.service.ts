@@ -1,10 +1,11 @@
 // auth/password-reset.service.ts
+
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.entity';
 import { MailerService } from './nodemailer.service';
-import { randomBytes } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class PasswordResetService {
@@ -12,6 +13,7 @@ export class PasswordResetService {
     @Inject('USERS_REPOSITORY')
     private usersRepository: Repository<User>,
     private readonly mailerService: MailerService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createResetToken(email: string): Promise<void> {
@@ -21,16 +23,10 @@ export class PasswordResetService {
     }
 
     // Generate unique token
-    const randomString = randomBytes(20).toString('hex');
-    const token = await bcrypt.hash(email + new Date().toISOString() + randomString, 10);
-    
-    /// Calculate expiration time 1 hour from now
-const expirationTime = new Date();
-expirationTime.setHours(expirationTime.getHours() + 1); 
+    const token = this.jwtService.sign({ email }, { expiresIn: '1h' });
 
-user.resetPasswordToken = token;
-user.resetPasswordExpires = expirationTime;
-
+    // Store token directly in user object (you may need to adjust your User entity)
+    user.resetPasswordToken = token;
 
     await this.usersRepository.save(user);
 
@@ -39,27 +35,30 @@ user.resetPasswordExpires = expirationTime;
   }
 
   async findUserByResetToken(token: string): Promise<User | null> {
-    const user = await this.usersRepository.findOne({
-      where: {
-        resetPasswordToken: token,
-        resetPasswordExpires: MoreThan(new Date()), // Check if token is not expired
-      },
-    });
+    try {
+      const { email } = this.jwtService.verify(token); // Verify and decode JWT token
+      const user = await this.usersRepository.findOne({ where: { email } });
 
-    return user;
+      if (!user || user.resetPasswordToken !== token) {
+        throw new BadRequestException('Invalid token');
+      }
+
+      return user;
+    } catch (err) {
+      throw new BadRequestException('Invalid token');
+    }
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const user = await this.findUserByResetToken(token);
 
     if (!user) {
-      throw new BadRequestException('Invalid or expired token');
+      throw new BadRequestException('Invalid token');
     }
 
     // Hash the new password before saving
     user.password = await bcrypt.hash(newPassword, 10);
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
+    user.resetPasswordToken = null; // Clear reset token after password reset
     await this.usersRepository.save(user);
   }
 }
