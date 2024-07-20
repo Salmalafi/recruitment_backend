@@ -6,12 +6,16 @@ import { Application } from './application.entity';
 import { CreateApplicationDto } from './DTO/CreateApplicationDto';
 import { UpdateApplicationDto } from './DTO/CreateApplicationDto';
 import * as Grid from 'gridfs-stream';
+import { MailerService } from 'src/auth/nodemailer.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ApplicationsService {
   constructor(
     @InjectRepository(Application)
     private readonly applicationRepository: Repository<Application>,
+    private readonly mailerService: MailerService,
+    private readonly userService: UsersService,
   ) {}
 
   async create(createApplicationDto: CreateApplicationDto): Promise<Application> {
@@ -39,16 +43,21 @@ export class ApplicationsService {
       where: { offerId: offerId },
     });
   }
-
+  
   async findOne(id: ObjectId): Promise<Application> {
     return this.applicationRepository.findOne({ where: { _id: id } });
   }
-
   async update(id: ObjectId, updateApplicationDto: UpdateApplicationDto): Promise<Application> {
     await this.applicationRepository.update(id, updateApplicationDto);
-    return this.applicationRepository.findOne({ where: { _id: id } });
-  }
+    const updatedApplication = await this.applicationRepository.findOne({ where: { _id: id } });
+    if (updateApplicationDto.status) {
+      const applicantId = updatedApplication.userId; 
+      const applicantEmail = await this.userService.getUserEmailById(applicantId);
+      await this.mailerService.sendStatusUpdateEmail(applicantEmail, updateApplicationDto.status);
+    }
 
+    return updatedApplication;
+  }
   async remove(id: ObjectId): Promise<void> {
     await this.applicationRepository.delete(id);
   }

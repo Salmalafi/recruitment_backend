@@ -11,12 +11,17 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import * as path from 'path';
 import { Response } from 'express';
+import { MailerService } from 'src/auth/nodemailer.service';
+import { UsersService } from 'src/users/users.service';
 
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('applications')
 export class ApplicationsController {
-  constructor(private readonly applicationsService: ApplicationsService) {}
+  constructor(private readonly applicationsService: ApplicationsService,
+    private readonly mailerService: MailerService,
+    private readonly usersService : UsersService
+  ) {}
  @Roles(Role.Candidate)
   @Post()
   @Bind(UploadedFiles())
@@ -32,7 +37,7 @@ export class ApplicationsController {
       throw new BadRequestException('Resume file is missing or has no filename');
     }
 
-    createApplicationDto.resume = files.resume[0].filename; 
+    createApplicationDto.resume = files.resume[0].filename;
     if (files.motivationLetter && files.motivationLetter.length > 0 && files.motivationLetter[0].filename) {
       createApplicationDto.motivationLetter = files.motivationLetter[0].filename;
     }
@@ -40,9 +45,20 @@ export class ApplicationsController {
     createApplicationDto.userId = new ObjectId(createApplicationDto.userId);
     createApplicationDto.offerId = new ObjectId(createApplicationDto.offerId);
 
-    return this.applicationsService.create(createApplicationDto);
+    const newApplication = await this.applicationsService.create(createApplicationDto);
+    try {
+      const applicantEmail = await this.usersService.getUserEmailById(createApplicationDto.userId); 
+
+      await this.mailerService.sendApplicationCreatedEmail(applicantEmail);
+    } catch (error) {
+      console.error('Error sending application created email:', error);
+
+    }
+
+    return newApplication;
   }
-  @Roles(Role.Admin, Role.HrAgent)
+
+  @Roles( Role.HrAgent)
   @Get()
   findAll() {
     return this.applicationsService.findAll();
@@ -51,19 +67,26 @@ export class ApplicationsController {
   @Get('user/:userId')
   async findByUserId(@Param('userId') userId: string) {
     try {
-      const objectId = new ObjectId(userId); // Convert userId to ObjectId
+      const objectId = new ObjectId(userId);
       return this.applicationsService.findByUserId(objectId);
     } catch (error) {
       console.error('Error converting userId to ObjectId:', error);
-      throw error; // Handle or rethrow the error as needed
+      throw error;
     }
 
   }
   @Roles(Role.HrAgent)
   @Get('offer/:offerId')
-  findByOfferId(@Param('offerId') offerId: ObjectId) {
-    return this.applicationsService.findByOfferId(offerId);
+  async findByOfferId(@Param('offerId') offerId: string) {
+    try {
+      const objectId = new ObjectId(offerId);
+      return this.applicationsService.findByOfferId(objectId);
+    } catch (error) {
+      console.error('Error converting offerId to ObjectId:', error);
+      throw new BadRequestException('Invalid Offer ID format');
+    }
   }
+  
   @Get('resume/:filename')
   getResume(@Param('filename') filename: string, @Res() res: Response) {
     const filePath = path.join(__dirname, '..', '..', 'uploads', filename);
@@ -74,15 +97,21 @@ export class ApplicationsController {
     const objectId = new ObjectId(id);
     return this.applicationsService.findOne(objectId);
   }
-  @Public()
   @Patch(':id')
   @UseInterceptors(FileInterceptor('resume'))
-  async update(@Param('id') id: string, @UploadedFile() resume: Express.Multer.File, @Body() updateApplicationDto: UpdateApplicationDto) {
+  async update(
+    @Param('id') id: string,
+    @UploadedFile() resume: Express.Multer.File,
+    @Body() updateApplicationDto: UpdateApplicationDto,
+  ) {
+   
+
     if (resume) {
       updateApplicationDto.resume = resume.filename;
     }
-    const objectId = new ObjectId(id);
-    return this.applicationsService.update(objectId, updateApplicationDto);
+
+    const applicationId = new ObjectId(id);
+    return this.applicationsService.update( applicationId, updateApplicationDto);
   }
   @Public()
   @Delete(':id')

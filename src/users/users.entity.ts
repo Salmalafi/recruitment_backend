@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { BaseEntity, Column, CreateDateColumn, Entity, ObjectIdColumn, OneToMany } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import { Application } from 'src/application/application.entity';
+import { FavoriteOffers } from 'src/favorite-offers/favoriteOffers.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -61,11 +62,15 @@ export class User extends BaseEntity {
   updatedAt: Date;
   @Column({ default: null })
   resetPasswordToken: string;
-
+  @Column({ default: false })
+  subscribed: boolean;
   @Column({ default: null })
   resetPasswordExpires: Date;
   @Column({ nullable: true })
   linkedinId: string;
   @OneToMany(() => Application, application => application.user)
   applications: Application[];
+
+  @OneToMany(() => FavoriteOffers, favoriteOffers => favoriteOffers.user)
+  favorites: FavoriteOffers[];
 }

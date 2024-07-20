@@ -10,6 +10,8 @@ import { DatabaseModule } from 'src/database/database.module';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { UsersModule } from 'src/users/users.module';
+import { MailerService } from 'src/auth/nodemailer.service';
 
 
 @Module({
@@ -24,7 +26,9 @@ import { RolesGuard } from 'src/auth/roles.guard';
         synchronize: true,
         logging: false,
       }),
-    DatabaseModule
+    DatabaseModule,
+    UsersModule
+  
   ],
   providers: [OffersService,   {
     provide: APP_GUARD,
@@ -32,7 +36,8 @@ import { RolesGuard } from 'src/auth/roles.guard';
   },{
     provide: APP_GUARD,
     useClass: AuthGuard,
-  }],
+  },
+  MailerService],
   controllers: [OffersController],
 })
 export class OffersModule {}

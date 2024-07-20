@@ -2,6 +2,7 @@
 import { Application } from 'src/application/application.entity';
 import { Entity, Column, ObjectIdColumn, OneToMany, CreateDateColumn } from 'typeorm';
 import { ObjectId } from 'mongodb';
+import { FavoriteOffers } from 'src/favorite-offers/favoriteOffers.entity';
 
 @Entity()
 export class Offer {
@@ -43,4 +44,6 @@ export class Offer {
 
   @OneToMany(() => Application, application => application.offer)
   applications: Application[];
+  @OneToMany(() => FavoriteOffers, favoriteOffers => favoriteOffers.offer)
+  favorites: FavoriteOffers[];
 }

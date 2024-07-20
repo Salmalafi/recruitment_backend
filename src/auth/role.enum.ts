@@ -1,7 +1,7 @@
 // role.enum.ts
 export enum Role {
     User = 'Candidate',
-    HrAgent = 'HR agent',
+    HrAgent = 'HrAgent',
     Admin = 'Admin',
     Candidate = "Candidate",
   }

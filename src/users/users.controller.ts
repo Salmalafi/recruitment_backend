@@ -36,9 +36,10 @@ export class UsersController {
   }
   @Public()
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.usersService.findOne(id);
+  findOne(@Param('id') id: string): Promise<User> {
+    return this.usersService.findOne(id); 
   }
+  
   @Public()
   @Post('findByEmail')
   async findByEmail(@Body('email') email: string): Promise<User> {

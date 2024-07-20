@@ -13,6 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as express from 'express';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { FavoriteOffersModule } from './favorite-offers/favorite-offers.module';
 @Module({
   imports: [AuthModule, MulterModule.register({
     storage: diskStorage({
@@ -22,7 +23,7 @@ import { diskStorage } from 'multer';
         cb(null, filename);
       },
     }),
-  }), PostModule,UsersModule, EnvModule, LinkedInModule, OffersModule, ApplicationsModule],
+  }), PostModule,UsersModule, EnvModule, LinkedInModule, OffersModule, ApplicationsModule, FavoriteOffersModule],
   controllers: [AppController],
   providers: [AppService],
   exports: [],
