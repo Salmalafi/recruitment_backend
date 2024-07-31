@@ -7,6 +7,7 @@ import { Application } from './application.entity';
 import { MailerService } from 'src/auth/nodemailer.service';
 
 import { UsersModule } from 'src/users/users.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { UsersModule } from 'src/users/users.module';
     MulterModule.register({
       dest: './uploads', 
     }),
-    UsersModule
+    UsersModule,
+    HttpModule
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService, MailerService],

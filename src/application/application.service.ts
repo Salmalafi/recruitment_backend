@@ -43,7 +43,9 @@ export class ApplicationsService {
       where: { offerId: offerId },
     });
   }
-  
+  async find(query: any): Promise<Application[]> {
+    return this.applicationRepository.find(query);
+  }
   async findOne(id: ObjectId): Promise<Application> {
     return this.applicationRepository.findOne({ where: { _id: id } });
   }

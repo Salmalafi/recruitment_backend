@@ -8,7 +8,6 @@ export class CreateApplicationDto {
   userId: ObjectId;
   offerId: ObjectId;
   motivationLetter?: string;
-
   status: ApplicationStatus = ApplicationStatus.PENDING;
 }
 

@@ -14,6 +14,7 @@ import * as express from 'express';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FavoriteOffersModule } from './favorite-offers/favorite-offers.module';
+import { MessagesModule } from './messages/messages.module';
 @Module({
   imports: [AuthModule, MulterModule.register({
     storage: diskStorage({
@@ -23,7 +24,7 @@ import { FavoriteOffersModule } from './favorite-offers/favorite-offers.module';
         cb(null, filename);
       },
     }),
-  }), PostModule,UsersModule, EnvModule, LinkedInModule, OffersModule, ApplicationsModule, FavoriteOffersModule],
+  }), PostModule,UsersModule, EnvModule, LinkedInModule, OffersModule, ApplicationsModule, FavoriteOffersModule, MessagesModule],
   controllers: [AppController],
   providers: [AppService],
   exports: [],
