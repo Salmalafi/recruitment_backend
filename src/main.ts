@@ -9,11 +9,11 @@ import { CustomIoAdapter } from './CustomIoAdapter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://localhost:5173', // Allow requests only from this origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific methods
-    allowedHeaders: 'Content-Type, Authorization', // Allow specific headers
+    origin: 'http://localhost:5173', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization', 
   });
-  app.useWebSocketAdapter(new CustomIoAdapter(app)); // Use the custom adapter
+  app.useWebSocketAdapter(new CustomIoAdapter(app));
 
   await app.listen(3000);
 }

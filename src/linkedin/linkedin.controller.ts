@@ -13,9 +13,9 @@ export class LinkedInController {
   @Post('auth/login')
   async login(@Body('authorization_code') authorizationCode: string): Promise<any> {
     const token: LinkedInUserTokenObject = 
-        await this.linkedInService.login(authorizationCode); // Get permissions from LinkedIn server(s)
+        await this.linkedInService.login(authorizationCode);
     const profile: LinkedInUserProfileObject = 
-        await this.linkedInService.getProfile(token.accessToken); // Get profile from LinkedIn server(s)
+        await this.linkedInService.getProfile(token.accessToken); 
     return profile;
   }
 

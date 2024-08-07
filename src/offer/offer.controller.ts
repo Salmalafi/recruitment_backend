@@ -46,14 +46,14 @@ export class OffersController {
     return this.offersService.findOne(objectId);
   }
 
-  @Roles(Role.HrAgent)
+  @Roles(Role.HrAgent,Role.Admin)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
     const objectId = new ObjectId(id);
     return this.offersService.update(objectId, updateOfferDto);
   }
 
-  @Roles(Role.HrAgent)
+  @Roles(Role.HrAgent,Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: string) {
     const objectId = new ObjectId(id);

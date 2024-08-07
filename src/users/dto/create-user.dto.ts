@@ -9,10 +9,12 @@ export class CreateUserDto {
   readonly roles: Role[];
 }
 
-
-
 export class UpdateUserDto {
   readonly email?: string;
   readonly password?: string;
+  readonly phone?: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
+  readonly isActive?: boolean;
   readonly roles?: Role[];
 }

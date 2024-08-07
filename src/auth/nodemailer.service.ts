@@ -41,7 +41,6 @@ export class MailerService {
         console.log(`Newsletter sent successfully to ${user.email}`);
       } catch (error) {
         console.error(`Failed to send newsletter to ${user.email}:`, error);
-        // Handle email sending error (log, notify admin, etc.)
       }
     }
   }
@@ -149,6 +148,47 @@ export class MailerService {
       subject,
       text,
       html: `<p>${text}</p>`,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
+  async sendPasswordChangedEmail(to: string, newPassword: string) {
+    const subject = 'Password Change Confirmation';
+    const text = `Dear User,
+
+      This is a confirmation that your password has been successfully changed. If you did not request this change, please contact our support team immediately.
+
+      Best regards,
+      Recruitment Team`;
+    const html = `<p>${text}</p>`;
+
+    const mailOptions = {
+      from: "noreply@capgeminirecrutement.com",
+      to,
+      subject,
+      text,
+      html,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
+  async sendHrAgentWelcomeEmail(to: string, password: string) {
+    const subject = 'Welcome to Our Team!';
+    const text = `Dear HrAgent,
+
+      We are excited to welcome you to our team! We look forward to the contributions you will bring and the positive impact you will make.
+     You can log in into your account with your emmail and this initial password : ${password}
+     We recommend that you update your password soon .
+      Best regards,
+      Recruitment Team`;
+    const html = `<p>${text}</p>`;
+
+    const mailOptions = {
+      from: "noreply@capgeminirecrutement.com",
+      to,
+      subject,
+      text,
+      html,
     };
 
     await this.transporter.sendMail(mailOptions);

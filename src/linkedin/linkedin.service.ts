@@ -21,11 +21,10 @@ export class LinkedInService {
     }
 
     async getProfile(accessToken: string): Promise<LinkedInUserProfileObject> {
-        /* (1) Get email of LinkedIn client */
+       
         const req1 = await getLinkedInEmailAddress(accessToken);
         const email = req1?.data?.elements[0]['handle~'].emailAddress;
 
-        /* (2) Get (first/last)name and profile image of LinkedIn client */
         const req2 = await getLinkedInProfile(accessToken);
         const firstName = req2?.data?.firstName?.localized?.fr_FR;
         const lastName = req2?.data?.lastName?.localized?.fr_FR;

@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Get, BadRequestException, Param } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { Message } from './messages.entity';
-import { ObjectId } from 'mongodb';
 import { Public } from 'src/auth/auth.controller';
 
 @Controller('messages')
@@ -18,12 +17,15 @@ export class MessagesController {
     @Body('content') content: string,
   ) {
     try {
+      const timestamp = new Date().toISOString(); 
+      console.log(timestamp);
       await this.messagesService.createMessage(
         senderId,
         senderRole,
         receiverId,
         receiverRole,
-        content
+        content,
+        timestamp, 
       );
     } catch (error) {
       console.error('Error creating message:', error);
@@ -37,11 +39,23 @@ export class MessagesController {
     @Param('receiverId') receiverId: string,
   ): Promise<Message[]> {
     try {
-      // If senderId and receiverId are strings, remove ObjectId validation
       return await this.messagesService.getMessages(senderId, receiverId);
     } catch (error) {
       console.error('Error fetching messages:', error);
       throw new BadRequestException('Error fetching messages');
     }
   }
+
+  @Get(':senderId')
+  async getCandidateMessages(
+    @Param('senderId') senderId: string,
+  ): Promise<Message[]> {
+    try {
+      return await this.messagesService.getCandidateMessages(senderId);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      throw new BadRequestException('Error fetching messages');
+    }
+  }
 }
+

@@ -42,4 +42,8 @@ export class CreateOfferDto {
   @IsString()
   @IsNotEmpty()
   experience: string;
+  
+  @IsString()
+  @IsNotEmpty()
+  rythme: string;
 }

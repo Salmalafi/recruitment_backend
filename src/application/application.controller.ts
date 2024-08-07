@@ -64,7 +64,7 @@ export class ApplicationsController {
     return newApplication;
   }
 
-  @Roles(Role.HrAgent)
+  @Roles(Role.HrAgent,Role.Admin)
   @Get()
   findAll() {
     return this.applicationsService.findAll();
@@ -82,7 +82,7 @@ export class ApplicationsController {
     }
   }
 
-  @Roles(Role.HrAgent)
+  @Roles(Role.HrAgent,Role.Admin)
   @Get('offer/:offerId')
   async findByOfferId(@Param('offerId') offerId: string) {
     try {
@@ -146,7 +146,6 @@ export class ApplicationsController {
   
     const form = new FormData();
   
-    // Append files to FormData
     for (const application of filteredApplications) {
       if (application.resume) {
         const resumePath = path.join(__dirname, '..', '..', 'uploads', application.resume);
@@ -154,10 +153,10 @@ export class ApplicationsController {
   
         if (fs.existsSync(resumePath)) {
           try {
-            // Append file stream to form data
+          
             form.append('files', fs.createReadStream(resumePath), {
               filename: path.basename(resumePath),
-              contentType: 'application/pdf', // Adjust content type if necessary
+              contentType: 'application/pdf', 
             });
           } catch (error) {
             console.error(`Error reading file ${resumePath}:`, error.message);
@@ -179,21 +178,19 @@ export class ApplicationsController {
     try {
       const response = await axios.post('http://localhost:8000/rank_cvs/', form, {
         headers: {
-          ...form.getHeaders(), // Include headers from form-data
+          ...form.getHeaders(), 
         }
       });
   
-      // Handle ranking response
       const rankedCvs = response.data.ranked_cvs;
       
-      // Sort applications based on ranking
       const sortedApplications = filteredApplications.map(app => {
         const ranking = rankedCvs.find(rank => rank.path === app.resume);
         return {
           ...app,
           score: ranking ? ranking.score : 0,
         };
-      }).sort((a, b) => b.score - a.score); // Sort by score descending
+      }).sort((a, b) => b.score - a.score); 
   
       return sortedApplications;
     } catch (error) {

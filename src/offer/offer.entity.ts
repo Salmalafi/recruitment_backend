@@ -38,7 +38,8 @@ export class Offer {
 
   @Column()
   experience: string;
-
+  @Column()
+  rythme: string;
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date; 
 
